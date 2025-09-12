@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection.Emit;
 using NetDeque;
 
 namespace NetDequeTests;
@@ -116,37 +117,157 @@ public class DequeShould
     }
     #endregion
     
-    #region Espiadas    
+    #region Espiadas   
+    [Fact]
+    public void PeekBegShouldThrowInvalidOperationExceptionWhenDequeIsEmpty()
+    {
+        var sut = new Deque<string>();
+        
+        Assert.Throws<InvalidOperationException>(() => sut.PeekBeg());
+    }
+
+    [Fact]
+    public void PeekEndShouldThrowInvalidOperationExceptionWhenDequeIsEmpty()
+    {
+        var sut = new Deque<string>();
+        
+        Assert.Throws<InvalidOperationException>(() => sut.PeekEnd());
+    }
+    
+    [Fact]
+    public void PeekBegShouldNotChangeCount()
+    {
+        var sut = new Deque<string>();
+        sut.AddBeg("element1");
+        sut.AddBeg("element2");
+        sut.AddBeg("element3");
+        
+        sut.PeekBeg();
+        
+        Assert.Equal(3, sut.Count);
+    }
+
+    [Fact]
+    public void PeekEndShouldNotChangeCount()
+    {
+        var sut = new Deque<string>();
+        
+        sut.AddEnd("element1");
+        sut.AddEnd("element2");
+        sut.AddEnd("element3");
+        
+        sut.PeekEnd();
+        
+        Assert.Equal(3, sut.Count);
+    }
+
+    [Fact]
+    public void PeekBegShouldReturnTheFirstElement()
+    {
+        var sut = new Deque<string>();
+        
+        sut.AddBeg("element1");
+        sut.AddBeg("element2");
+        sut.AddBeg("element3");
+        
+        Assert.Equal("element3", sut.PeekBeg());
+        Assert.Equal(3, sut.Count);
+        
+    }
+
+    [Fact]
+    public void PeekEndShouldReturnTheLastElement()
+    {
+        var sut = new Deque<string>();
+        
+        sut.AddEnd("element1");
+        sut.AddEnd("element2");
+        sut.AddEnd("element3");
+        
+        Assert.Equal("element3", sut.PeekEnd());
+        Assert.Equal(3, sut.Count);        
+    }
+    
     #endregion
-  
+
+    #region Cenários Mistos
+    [Fact]
+    public void AddBegAndRemEndShouldReturnTheLastElement()
+    {
+        var sut = new Deque<string>();
+        sut.AddBeg("element1");
+        sut.AddEnd("element2");
+        
+        Assert.Equal("element2", sut.RemEnd());
+        Assert.Equal(1, sut.Count);
+    }
+
+    [Fact]
+    public void ReturnTheLastElementWhenAddBegAndRemEnd()
+    {
+        var sut = new Deque<string>();
+        sut.AddBeg("element1");
+        
+        Assert.Equal("element1", sut.RemEnd());
+    }
     
-    
-    
-    /*
-    6. Espiadas (PeekBeg e PeekEnd)
-    PeekBeg em um deque vazio deve lançar InvalidOperationException .
-        PeekEnd em um deque vazio deve lançar InvalidOperationException .
-        Inserir elementos e verificar se PeekBeg e PeekEnd retornam os valores corretos sem removê-
-    los.
-        Garantir que Count não seja alterado após um Peek .
-*/
-    
-/*
-     
-    7. Cenários mistos
-    Inserir no início e no final intercaladamente e verificar a consistência da ordem.
-        Remover do início após inserir no final (e vice-versa), garantindo comportamento correto.
-        Verificar que após várias operações de inserção e remoção, o deque ainda mantém o estado
-    consistente (sem elementos "fantasmas").
-      
-      
-        8. Teste de integridade geral
-    Enfileirar e desenfileirar grandes quantidades de elementos em ambos os lados e verificar se
-    todos os elementos corretos foram mantidos e removidos.
-    
-    9. TESTE EXTRA?!? adicionar no começo e remover no final e verificar que o count não muda porém o último elemento é alterado
-    
-    */
+    [Fact]
+    public void ReturnTheFirstElementWhenAddEndAndRemBeg()
+    {
+        var sut = new Deque<string>();
+        sut.AddEnd("element1");
+        
+        Assert.Equal("element1", sut.RemBeg());
+    }
+
+    [Fact]
+    public void MaintainTheStateConsistencyAfterMultipleOperations()
+    {
+        var sut = new Deque<string>();
+        sut.AddBeg("element1");
+        sut.AddEnd("element2");
+        sut.AddBeg("element3");
+        sut.AddEnd("element4");
+        sut.AddBeg("element5");
+        
+        sut.RemBeg();
+        sut.RemEnd();
+        sut.RemBeg();
+        sut.RemEnd();
+        sut.RemBeg();
+        
+        Assert.Equal(0, sut.Count);
+    }
+    #endregion
+
+    #region Testes de integridade geral
+    [Fact]
+    public void AddAndRemoveElementsFromBothSides()
+    {
+        var sut = new Deque<string>();
+        sut.AddBeg("element1"); 
+        sut.AddEnd("element2"); // 1, 2
+        sut.AddBeg("element3"); // 3, 1, 2 
+        sut.AddEnd("element4"); // 3, 1, 2, 4
+        sut.AddBeg("element5"); // 5, 3, 1, 2, 4
+        sut.AddEnd("element6"); // 5, 3, 1, 2, 4, 6
+        sut.AddBeg("element7"); // 7, 5, 3, 1, 2, 4, 6
+        sut.AddEnd("element8"); // 7, 5, 3, 1, 2, 4, 6, 8
+        sut.AddBeg("element9"); // 9, 7, 5, 3, 1, 2, 4, 6, 8
+        sut.AddEnd("element10"); // 9, 7, 5, 3, 1, 2, 4, 6, 8, 10
+            
+        for (int i = 0; i < 4; i++)
+        {
+            sut.RemBeg();
+            sut.RemEnd();
+        }
+            
+        Assert.Equal("element1", sut.RemBeg());
+        Assert.Equal(1, sut.Count);
+        Assert.Equal("element2", sut.RemEnd());
+        Assert.Equal(0, sut.Count);
+        }
+    #endregion
     
     
 }
