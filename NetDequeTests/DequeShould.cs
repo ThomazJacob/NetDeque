@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection.Emit;
+using FluentAssertions;
 using NetDeque;
 
 namespace NetDequeTests;
@@ -12,7 +13,8 @@ public class DequeShould
     {
         var sut = new Deque<string>();
         
-        Assert.Equal(0, sut.Count);
+        //Assert.Equal(0, sut.Count);
+        sut.Count.Should().Be(0);
     }
     
     [Fact]
@@ -20,7 +22,8 @@ public class DequeShould
     {
         var sut = new Deque<string>();
         
-        Assert.True(sut.IsEmpty);
+        //Assert.True(sut.IsEmpty);
+        sut.IsEmpty.Should().BeTrue();
     }
     #endregion
 
@@ -29,9 +32,11 @@ public class DequeShould
     public void AddElementToTheBeginningOfTheDequeCorrectly()
     {
         var sut = new Deque<string>();
+        
         sut.AddBeg("element");
        
-        Assert.Equal("element", sut.PeekBeg());
+        //Assert.Equal("element", sut.PeekBeg());
+        sut.PeekBeg().Should().Be("element");
     }
 
     [Fact]
@@ -43,7 +48,8 @@ public class DequeShould
         sut.AddBeg("element2");
         sut.AddBeg("element3");
           
-        Assert.Equal("element3", sut.RemBeg());
+        //Assert.Equal("element3", sut.RemBeg());
+        sut.RemBeg().Should().Be("element3");
     }
     #endregion
       
@@ -55,18 +61,21 @@ public class DequeShould
         
         sut.AddEnd("element");
           
-        Assert.Equal("element", sut.PeekEnd());
+        //Assert.Equal("element", sut.PeekEnd());
+        sut.PeekEnd().Should().Be("element");
     }
 
     [Fact]
     public void AddMultipleElementsToTheEndAndRemoveThemInOrderFromTheEnd()
     {
         var sut = new Deque<string>();
+        
         sut.AddEnd("element1");     
         sut.AddEnd("element2");     
         sut.AddEnd("element3");
           
-        Assert.Equal("element3", sut.RemEnd());
+        //Assert.Equal("element3", sut.RemEnd());
+        sut.RemEnd().Should().Be("element3");
     }
     #endregion
     
@@ -76,28 +85,29 @@ public class DequeShould
     {
         var sut = new Deque<string>();
         
-        Assert.Throws<InvalidOperationException>(() => sut.RemBeg());
+        var action = () => sut.RemBeg();
+        var action2 = () => sut.RemEnd();
+        
+        //Assert.Throws<InvalidOperationException>(action);
+        action.Should().ThrowExactly<InvalidOperationException>();
+        action2.Should().ThrowExactly<InvalidOperationException>();
     }
     
     [Fact]
     public void RemoveElementFromTheBeginningOfTheDequeCorrectly()
     {
         var sut = new Deque<string>();
+        
         sut.AddBeg("element1");
         sut.AddBeg("element2");
         sut.AddBeg("element3");
         
-        Assert.Equal("element3", sut.RemBeg());
-        Assert.Equal("element2", sut.RemBeg());
-        Assert.Equal(1, sut.Count);
-    }
-
-    [Fact]
-    public void RemoveMultipleElementsFromTheBeginningAndRemoveThemInOrderFromTheBeginning()
-    {
-        var sut = new Deque<string>();  
-        sut.AddBeg("element1"); 
-        
+        //Assert.Equal("element3", sut.RemBeg());
+        //Assert.Equal("element2", sut.RemBeg());
+        //Assert.Equal(1, sut.Count);
+        sut.RemBeg().Should().Be("element3");
+        sut.RemBeg().Should().Be("element2");
+        sut.Count.Should().Be(1);
     }
     #endregion
 
@@ -107,13 +117,17 @@ public class DequeShould
     public void RemoveMultipleElementsFromTheEndAndRemoveThemInOrderFromTheEnd()
     {
         var sut = new Deque<string>();
+        
         sut.AddEnd("element1");     
         sut.AddEnd("element2");     
         sut.AddEnd("element3");
-        Assert.Equal("element3", sut.RemEnd());
-        Assert.Equal("element2", sut.RemEnd());
         
-        Assert.Equal(1, sut.Count);
+        //Assert.Equal("element3", sut.RemEnd());
+        //Assert.Equal("element2", sut.RemEnd());
+        //Assert.Equal(1, sut.Count);
+        sut.RemEnd().Should().Be("element3");
+        sut.RemEnd().Should().Be("element2");
+        sut.Count.Should().Be(1);
     }
     #endregion
     
@@ -123,7 +137,10 @@ public class DequeShould
     {
         var sut = new Deque<string>();
         
-        Assert.Throws<InvalidOperationException>(() => sut.PeekBeg());
+        var action = () => sut.PeekBeg();
+        
+        //Assert.Throws<InvalidOperationException>(action);
+        action.Should().ThrowExactly<InvalidOperationException>();
     }
 
     [Fact]
@@ -131,20 +148,25 @@ public class DequeShould
     {
         var sut = new Deque<string>();
         
-        Assert.Throws<InvalidOperationException>(() => sut.PeekEnd());
+        var action = () => sut.PeekEnd();
+        
+        //Assert.Throws<InvalidOperationException>(action);
+        action.Should().ThrowExactly<InvalidOperationException>();
     }
     
     [Fact]
     public void PeekBegShouldNotChangeCount()
     {
         var sut = new Deque<string>();
+        
         sut.AddBeg("element1");
         sut.AddBeg("element2");
         sut.AddBeg("element3");
         
         sut.PeekBeg();
         
-        Assert.Equal(3, sut.Count);
+        //Assert.Equal(3, sut.Count);
+        sut.Count.Should().Be(3);
     }
 
     [Fact]
@@ -158,7 +180,8 @@ public class DequeShould
         
         sut.PeekEnd();
         
-        Assert.Equal(3, sut.Count);
+        //Assert.Equal(3, sut.Count);
+        sut.Count.Should().Be(3);       
     }
 
     [Fact]
@@ -170,9 +193,10 @@ public class DequeShould
         sut.AddBeg("element2");
         sut.AddBeg("element3");
         
-        Assert.Equal("element3", sut.PeekBeg());
-        Assert.Equal(3, sut.Count);
-        
+        // Assert.Equal("element3", sut.PeekBeg());
+        // Assert.Equal(3, sut.Count);
+        sut.PeekBeg().Should().Be("element3");
+        sut.Count.Should().Be(3);       
     }
 
     [Fact]
@@ -184,8 +208,10 @@ public class DequeShould
         sut.AddEnd("element2");
         sut.AddEnd("element3");
         
-        Assert.Equal("element3", sut.PeekEnd());
-        Assert.Equal(3, sut.Count);        
+        // Assert.Equal("element3", sut.PeekEnd());
+        // Assert.Equal(3, sut.Count);        
+        sut.PeekEnd().Should().Be("element3");
+        sut.Count.Should().Be(3);       
     }
     
     #endregion
@@ -195,35 +221,43 @@ public class DequeShould
     public void AddBegAndRemEndShouldReturnTheLastElement()
     {
         var sut = new Deque<string>();
+        
         sut.AddBeg("element1");
         sut.AddEnd("element2");
         
-        Assert.Equal("element2", sut.RemEnd());
-        Assert.Equal(1, sut.Count);
+        // Assert.Equal("element2", sut.RemEnd());
+        // Assert.Equal(1, sut.Count);
+        sut.RemEnd().Should().Be("element2");
+        sut.Count.Should().Be(1);       
     }
 
     [Fact]
     public void ReturnTheLastElementWhenAddBegAndRemEnd()
     {
         var sut = new Deque<string>();
+        
         sut.AddBeg("element1");
         
-        Assert.Equal("element1", sut.RemEnd());
+        // Assert.Equal("element1", sut.RemEnd());
+        sut.RemEnd().Should().Be("element1");
     }
     
     [Fact]
     public void ReturnTheFirstElementWhenAddEndAndRemBeg()
     {
         var sut = new Deque<string>();
+        
         sut.AddEnd("element1");
         
-        Assert.Equal("element1", sut.RemBeg());
+        // Assert.Equal("element1", sut.RemBeg());
+        sut.RemBeg().Should().Be("element1");
     }
 
     [Fact]
     public void MaintainTheStateConsistencyAfterMultipleOperations()
     {
         var sut = new Deque<string>();
+        
         sut.AddBeg("element1");
         sut.AddEnd("element2");
         sut.AddBeg("element3");
@@ -236,7 +270,8 @@ public class DequeShould
         sut.RemEnd();
         sut.RemBeg();
         
-        Assert.Equal(0, sut.Count);
+        // Assert.Equal(0, sut.Count);
+        sut.Count.Should().Be(0);       
     }
     #endregion
 
@@ -245,6 +280,7 @@ public class DequeShould
     public void AddAndRemoveElementsFromBothSides()
     {
         var sut = new Deque<string>();
+        
         sut.AddBeg("element1"); 
         sut.AddEnd("element2"); // 1, 2
         sut.AddBeg("element3"); // 3, 1, 2 
@@ -262,12 +298,14 @@ public class DequeShould
             sut.RemEnd();
         }
             
-        Assert.Equal("element1", sut.RemBeg());
-        Assert.Equal(1, sut.Count);
-        Assert.Equal("element2", sut.RemEnd());
-        Assert.Equal(0, sut.Count);
-        }
+        // Assert.Equal("element1", sut.RemBeg());
+        // Assert.Equal(1, sut.Count);
+        // Assert.Equal("element2", sut.RemEnd());
+        // Assert.Equal(0, sut.Count);
+        sut.RemBeg().Should().Be("element1");
+        sut.Count.Should().Be(1);
+        sut.RemEnd().Should().Be("element2");
+        sut.Count.Should().Be(0);       
+    }
     #endregion
-    
-    
 }
